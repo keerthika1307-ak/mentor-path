@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+       
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+       
+        /* Custom gradient backgrounds */
+        .auth-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+       
+        /* Role selection styling */
+        .role-option {
+            transition: all 0.3s ease;
+        }
+       
+        .role-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+       
+        .role-option.selected {
+            border-color: #4f46e5;
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+       
+        /* Input focus effects */
+        .input-field:focus {
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <img class="h-8 w-auto" src="https://placehold.co/160x40/d4d4d8/09090b?text=MentorSys" alt="Mentorship System Logo in dark gray on light gray background">
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+                    <button onclick="showForm('login')" class="text-gray-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Login</button>
+                    <button onclick="showForm('register')" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">Register</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow auth-bg flex items-center justify-center">
+        <div class="max-w-md w-full mx-4 fade-in" id="login-form">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+                <div class="p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800">Welcome Back</h2>
+                        <p class="text-gray-600 mt-2">Sign in to your account</p>
+                    </div>
+                   
+                    <form id="loginForm" class="space-y-6">
+                        <div>
+                            <label for="login-email" class="block text-sm font-medium text-gray-700">Email address</label>
+                            <div class="mt-1">
+                                <input id="login-email" name="email" type="email" autocomplete="email" required
+                                    class="input-field appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <div class="mt-1 relative">
+                                <input id="login-password" name="password" type="password" autocomplete="current-password" required
+                                    class="input-field appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5" onclick="togglePassword('login-password')">
+                                    👁️
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember-me" name="remember-me" type="checkbox"
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                                    Remember me
+                                </label>
+                            </div>
+
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                    Forgot your password?
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Sign in
+                            </button>
+                        </div>
+                    </form>
+                   
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-600">
+                            Don't have an account?
+                            <button onclick="showForm('register')" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                Register here
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-md w-full mx-4 hidden fade-in" id="register-form">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+                <div class="p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800">Create an Account</h2>
+                        <p class="text-gray-600 mt-2">Join our mentorship platform</p>
+                    </div>
+                   
+                    <form id="registerForm" class="space-y-6">
+                        <div>
+                            <label for="register-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <div class="mt-1">
+                                <input id="register-name" name="name" type="text" autocomplete="name" required
+                                    class="input-field appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                       
+                        <div>
+                            <label for="register-email" class="block text-sm font-medium text-gray-700">Email address</label>
+                            <div class="mt-1">
+                                <input id="register-email" name="email" type="email" autocomplete="email" required
+                                    class="input-field appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <div class="mt-1 relative">
+                                <input id="register-password" name="password" type="password" autocomplete="new-password" required
+                                    class="input-field appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5" onclick="togglePassword('register-password')">
+                                    👁️
+                                </button>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Password must be at least 8 characters long</p>
+                        </div>
+
+                        <div>
+                            <label for="register-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                            <div class="mt-1">
+                                <input id="register-confirm-password" name="confirm-password" type="password" autocomplete="new-password" required
+                                    class="input-field appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Your Role</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="role-option p-4 border rounded-lg cursor-pointer text-center" onclick="selectRole('admin')">
+                                    <div class="h-10 w-10 mx-auto mb-2">
+                                        <img src="https://placehold.co/40/d1d5db/d1d5db?text=􀣋" alt="Shield icon representing administrator role" class="h-full w-full">
+                                    </div>
+                                    <span class="text-sm font-medium">Admin</span>
+                                    <p class="text-xs text-gray-500 mt-1">Full system access</p>
+                                </div>
+                                <div class="role-option p-4 border rounded-lg cursor-pointer text-center" onclick="selectRole('mentor')">
+                                    <div class="h-10 w-10 mx-auto mb-2">
+                                        <img src="https://placehold.co/40/d1d5db/d1d5db?text=􀆮" alt="Graduation cap icon representing mentor role" class="h-full w-full">
+                                    </div>
+                                    <span class="text-sm font-medium">Mentor</span>
+                                    <p class="text-xs text-gray-500 mt-1">Guide mentees</p>
+                                </div>
+                                <div class="role-option p-4 border rounded-lg cursor-pointer text-center selected" onclick="selectRole('mentee')">
+                                    <div class="h-10 w-10 mx-auto mb-2">
+                                        <img src="https://placehold.co/40/d1d5db/d1d5db?text=􀎭" alt="Person icon representing mentee role" class="h-full w-full">
+                                    </div>
+                                    <span class="text-sm font-medium">Mentee</span>
+                                    <p class="text-xs text-gray-500 mt-1">Learn and grow</p>
+                                </div>
+                            </div>
+                            <input type="hidden" id="register-role" name="role" value="mentee">
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="terms" name="terms" type="checkbox" required
+                                    class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="terms" class="font-medium text-gray-700">I agree to the </label>
+                                <a href="#" class="text-indigo-600 hover:text-indigo-500 font-medium">terms and conditions</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Create Account
+                            </button>
+                        </div>
+                    </form>
+                   
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-600">
+                            Already have an account?
+                            <button onclick="showForm('login')" class="font-medium text-indigo-600 hover:text-indigo-500">
+                                Login here
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        <div id="dashboard" class="hidden max-w-4xl w-full mx-4 bg-white rounded-xl shadow-xl overflow-hidden p-8">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">User Dashboard</h1>
+                    <p class="text-gray-600" id="welcome-message">Welcome back!</p>
+                </div>
+                <button onclick="logout()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm font-medium">
+                    Logout
+                </button>
+            </div>
+           
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button id="profile-tab" class="border-indigo-500 text-indigo-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Profile
+                    </button>
+                    <button id="settings-tab" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Settings
+                    </button>
+                    <button id="permissions-tab" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Permissions
+                    </button>
+                </nav>
+            </div>
+           
+            <div id="profile-content" class="py-4">
+                <div class="flex items-center mb-6">
+                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center mr-4 overflow-hidden">
+                        <img id="user-avatar" src="https://placehold.co/64/d1d5db/d1d5db?text=􀉭" alt="Default user avatar" class="h-full w-full">
+                    </div>
+                    <div>
+                        <h2 id="user-name" class="text-xl font-semibold text-gray-800">John Doe</h2>
+                        <p id="user-role" class="text-gray-600">Mentee</p>
+                        <p id="user-email" class="text-gray-500 text-sm">john@example.com</p>
+                    </div>
+                </div>
+               
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-800 mb-2">Account Information</h3>
+                        <div id="user-info" class="text-gray-700 space-y-1">
+                            <!-- Dynamically filled by JS -->
+                        </div>
+                    </div>
+                   
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-800 mb-2">Role-Based Features</h3>
+                        <div id="role-features" class="space-y-2">
+                            <!-- Dynamically filled by JS -->
+                        </div>
+                    </div>
+                </div>
+               
+                <div id="admin-features" class="hidden">
+                    <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-indigo-800 mb-2">Administrator Tools</h3>
+                        <div class="flex space-x-4">
+                            <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium">
+                                Manage Users
+                            </button>
+                            <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium">
+                                System Settings
+                            </button>
+                            <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium">
+                                View Reports
+                            </button>
+                        </div>
+                    </div>
+                </div>
+               
+                <div id="mentor-features" class="hidden mt-4">
+                    <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-blue-800 mb-2">Mentor Dashboard</h3>
+                        <div class="flex space-x-4">
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                                My Mentees
+                            </button>
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                                Schedule Sessions
+                            </button>
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                                Resources
+                            </button>
+                        </div>
+                    </div>
+                </div>
+               
+                <div id="mentee-features" class="hidden mt-4">
+                    <div class="bg-green-50 border border-green-100 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-green-800 mb-2">Mentee Resources</h3>
+                        <div class="flex space-x-4">
+                            <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
+                                Find a Mentor
+                            </button>
+                            <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
+                                Learning Paths
+                            </button>
+                            <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
+                                Goals Tracker
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <div id="settings-content" class="hidden py-4">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Account Settings</h2>
+                <form class="space-y-6">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-800 mb-3">Personal Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <input type="text" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <input type="text" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" disabled class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-600 sm:text-sm">
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-800 mb-3">Change Password</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                                <input type="password" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                <input type="password" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                                <input type="password" class="input-field w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="flex justify-end">
+                        <button type="button" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-sm font-medium mr-2">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+           
+            <div id="permissions-content" class="hidden py-4">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Account Permissions</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                            <img src="https://placehold.co/24/d4d4d8/09090b?text=􀣋" alt="Shield icon representing permissions" class="h-6 w-6">
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800">Your Access Level</h3>
+                            <p id="permissions-description" class="text-gray-600">Based on your account type</p>
+                        </div>
+                    </div>
+                   
+                    <div id="permissions-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dynamically filled by JS -->
+                    </div>
+                </div>
+               
+                <div id="admin-permissions" class="hidden mt-6">
+                    <h3 class="text-lg font-medium text-gray-800 mb-3">User Management</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Dynamically filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Alert container -->
+    <div id="alert-container" class="fixed top-4 right-4 w-full max-w-xs"></div>
+
+    <script>
+        // Initialize user storage if not exists
+        if (!localStorage.getItem('mentorship_users')) {
+            const adminUser = {
+                id: generateId(),
+                name: 'Admin User',
+                email: 'admin@example.com',
+                password: 'Admin123!', // In production, passwords should be hashed
+                role: 'admin',
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            };
+           
+            const mentorUser = {
+                id: generateId(),
+                name: 'Mentor User',
+                email: 'mentor@example.com',
+                password: 'Mentor123!',
+                role: 'mentor',
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            };
+           
+            const menteeUser = {
+                id: generateId(),
+                name: 'Mentee User',
+                email: 'mentee@example.com',
+                password: 'Mentee123!',
+                role: 'mentee',
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            };
+           
+            localStorage.setItem('mentorship_users', JSON.stringify([adminUser, mentorUser, menteeUser]));
+        }
+       
+        // Current user session
+        let currentUser = null;
+       
+        // DOM elements
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginFormElement = document.getElementById('login-form');
+        const registerFormElement = document.getElementById('register-form');
+        const dashboardElement = document.getElementById('dashboard');
+       
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is already logged in
+            const session = JSON.parse(localStorage.getItem('current_user'));
+            if (session) {
+                currentUser = session;
+                showDashboard();
+                showAlert('Welcome back!', 'info');
+            }
+           
+            // Login form submission
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                loginUser(email, password);
+            });
+           
+            // Register form submission
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+                const role = document.getElementById('register-role').value || 'mentee';
+               
+                registerUser(name, email, password, confirmPassword, role);
+            });
+           
+            // Tab switching
+            document.getElementById('profile-tab').addEventListener('click', () => switchTab('profile'));
+            document.getElementById('settings-tab').addEventListener('click', () => switchTab('settings'));
+            document.getElementById('permissions-tab').addEventListener('click', () => switchTab('permissions'));
+        });
+       
+        // Form visibility functions
+        function showForm(formType) {
+            loginFormElement.classList.add('hidden');
+            registerFormElement.classList.add('hidden');
+            dashboardElement.classList.add('hidden');
+           
+            if (formType === 'login') {
+                loginFormElement.classList.remove('hidden');
+            } else if (formType === 'register') {
+                registerFormElement.classList.remove('hidden');
+            }
+           
+            // Reset form styles
+            const roleOptions = document.querySelectorAll('.role-option');
+            roleOptions.forEach(option => {
+                option.classList.remove('selected');
+                if (option.getAttribute('onclick').includes("'mentee'")) {
+                    option.classList.add('selected');
+                    document.getElementById('register-role').value = 'mentee';
+                }
+            });
+        }
+       
+        // Dashboard functions
+        function showDashboard() {
+            loginFormElement.classList.add('hidden');
+            registerFormElement.classList.add('hidden');
+            dashboardElement.classList.remove('hidden');
+           
+            // Update user info
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-email').textContent = currentUser.email;
+            document.getElementById('user-role').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+           
+            // Update user info section
+            const userInfoElement = document.getElementById('user-info');
+            userInfoElement.innerHTML = `
+                <p><span class="font-medium">Account Created:</span> ${new Date(currentUser.createdAt).toLocaleDateString()}</p>
+                <p><span class="font-medium">Last Login:</span> ${currentUser.lastLogin ? new Date(currentUser.lastLogin).toLocaleString() : 'Never'}</p>
+            `;
+           
+            // Show role-specific features
+            document.getElementById('admin-features').classList.add('hidden');
+            document.getElementById('mentor-features').classList.add('hidden');
+            document.getElementById('mentee-features').classList.add('hidden');
+            document.getElementById('admin-permissions').classList.add('hidden');
+           
+            document.getElementById('permissions-description').textContent =
+                `${currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)} permissions`;
+               
+            switch(currentUser.role) {
+                case 'admin':
+                    document.getElementById('admin-features').classList.remove('hidden');
+                    document.getElementById('admin-permissions').classList.remove('hidden');
+                    fillAdminFeatures();
+                    break;
+                case 'mentor':
+                    document.getElementById('mentor-features').classList.remove('hidden');
+                    fillMentorFeatures();
+                    break;
+                case 'mentee':
+                    document.getElementById('mentee-features').classList.remove('hidden');
+                    fillMenteeFeatures();
+                    break;
+            }
+           
+            // Display permissions
+            displayPermissions();
+           
+            // Switch to profile tab by default
+            switchTab('profile');
+           
+            // Update welcome message based on time of day
+            updateWelcomeMessage();
+        }
+       
+        function fillAdminFeatures() {
+            const roleFeaturesElement = document.getElementById('role-features');
+            roleFeaturesElement.innerHTML = `
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Create and manage user accounts</p>
+                </div>
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Assign and modify user roles</p>
+                </div>
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Access all system features and data</p>
+                </div>
+            `;
+           
+            // Fill users table
+            const users = JSON.parse(localStorage.getItem('mentorship_users'));
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = '';
+           
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${user.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${user.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                            ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                              user.role === 'mentor' ? 'bg-blue-100 text-blue-800' :
+                              'bg-green-100 text-green-800'}">
+                            ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                        <button class="ml-2 text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+       
+        function fillMentorFeatures() {
+            const roleFeaturesElement = document.getElementById('role-features');
+            roleFeaturesElement.innerHTML = `
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Create and manage mentorship sessions</p>
+                </div>
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>View mentee profiles and progress</p>
+                </div>
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Access mentoring resources and guides</p>
+                </div>
+            `;
+        }
+       
+        function fillMenteeFeatures() {
+            const roleFeaturesElement = document.getElementById('role-features');
+            roleFeaturesElement.innerHTML = `
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Find and connect with mentors</p>
+                </div>
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Track your learning goals</p>
+                </div>
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p>Access recommended resources</p>
+                </div>
+            `;
+        }
+       
+        function displayPermissions() {
+            const permissionsList = document.getElementById('permissions-list');
+            permissionsList.innerHTML = '';
+           
+            const adminPermissions = [
+                { name: 'User Management', description: 'Create, edit, and delete user accounts', allowed: currentUser.role === 'admin' },
+                { name: 'Role Assignment', description: 'Assign roles to users', allowed: currentUser.role === 'admin' },
+                { name: 'System Configuration', description: 'Modify system settings', allowed: currentUser.role === 'admin' },
+                { name: 'View All Reports', description: 'Access all analytics and reports', allowed: currentUser.role === 'admin' },
+                { name: 'Session Scheduling', description: 'Manage mentorship sessions', allowed: ['admin', 'mentor'].includes(currentUser.role) },
+                { name: 'Mentee Progress', description: 'View mentee learning progress', allowed: ['admin', 'mentor'].includes(currentUser.role) },
+                { name: 'Resource Access', description: 'Access learning resources', allowed: true },
+                { name: 'Profile Editing', description: 'Edit personal profile', allowed: true }
+            ];
+           
+            adminPermissions.forEach(perm => {
+                const permElement = document.createElement('div');
+                permElement.className = 'bg-white p-3 rounded-lg border';
+               
+                permElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${perm.name}</h4>
+                            <p class="text-sm text-gray-600">${perm.description}</p>
+                        </div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            ${perm.allowed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${perm.allowed ? 'Allowed' : 'Denied'}
+                        </span>
+                    </div>
+                `;
+               
+                permissionsList.appendChild(permElement);
+            });
+        }
+       
+        function switchTab(tabName) {
+            // Reset all tabs
+            document.getElementById('profile-tab').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('profile-tab').classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+           
+            document.getElementById('settings-tab').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('settings-tab').classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+           
+            document.getElementById('permissions-tab').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('permissions-tab').classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+           
+            // Hide all content
+            document.getElementById('profile-content').classList.add('hidden');
+            document.getElementById('settings-content').classList.add('hidden');
+            document.getElementById('permissions-content').classList.add('hidden');
+           
+            // Activate selected tab and content
+            document.getElementById(tabName + '-tab').classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            document.getElementById(tabName + '-tab').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+        }
+       
+        function updateWelcomeMessage() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greeting;
+           
+            if (hour < 12) {
+                greeting = 'Good morning';
+            } else if (hour < 18) {
+                greeting = 'Good afternoon';
+            } else {
+                greeting = 'Good evening';
+            }
+           
+            document.getElementById('welcome-message').textContent = `${greeting}, ${currentUser.name}!`;
+        }
+       
+        // Auth functions
+        function loginUser(email, password) {
+            const users = JSON.parse(localStorage.getItem('mentorship_users'));
+            const user = users.find(u => u.email === email);
+           
+            if (!user) {
+                showAlert('User not found. Please register.', 'error');
+                return;
+            }
+           
+            if (user.password !== password) {
+                showAlert('Incorrect password. Please try again.', 'error');
+                return;
+            }
+           
+            // Update last login
+            user.lastLogin = new Date().toISOString();
+            localStorage.setItem('mentorship_users', JSON.stringify(users));
+           
+            // Start session
+            currentUser = user;
+            localStorage.setItem('current_user', JSON.stringify(user));
+           
+            showDashboard();
+            showAlert('Login successful!', 'success');
+        }
+       
+        function registerUser(name, email, password, confirmPassword, role) {
+            // Validate password match
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match.', 'error');
+                return;
+            }
+           
+            // Validate password strength
+            if (password.length < 8) {
+                showAlert('Password must be at least 8 characters long.', 'error');
+                return;
+            }
+           
+            // Check if user already exists
+            const users = JSON.parse(localStorage.getItem('mentorship_users'));
+            const existingUser = users.find(u => u.email === email);
+           
+            if (existingUser) {
+                showAlert('User already exists. Please login.', 'error');
+                return;
+            }
+           
+            // Create new user
+            const newUser = {
+                id: generateId(),
+                name,
+                email,
+                password, // In production, hash this password
+                role: role || 'mentee',
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            };
+           
+            users.push(newUser);
+            localStorage.setItem('mentorship_users', JSON.stringify(users));
+           
+            // Auto login
+            currentUser = newUser;
+            localStorage.setItem('current_user', JSON.stringify(newUser));
+           
+            showDashboard();
+            showAlert('Registration successful!', 'success');
+        }
+       
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('current_user');
+            showForm('login');
+            showAlert('You have been logged out.', 'info');
+        }
+       
+        // Helper functions
+        function generateId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+       
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+       
+        function selectRole(role) {
+            const roleOptions = document.querySelectorAll('.role-option');
+            roleOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+           
+            // Highlight selected option
+            document.querySelector(`[onclick="selectRole('${role}')"]`).classList.add('selected');
+           
+            // Update hidden input
+            document.getElementById('register-role').value = role;
+        }
+       
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alert-container');
+           
+            const alert = document.createElement('div');
+            alert.className = `p-4 rounded-lg shadow-md mb-2 ${type === 'error' ? 'bg-red-100 text-red-800' :
+                               type === 'success' ? 'bg-green-100 text-green-800' :
+                               'bg-blue-100 text-blue-800'}`;
+           
+            alert.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="${type === 'error' ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' :
+                            type === 'success' ? 'M5 13l4 4L19 7' :
+                            'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" />
+                    </svg>
+                    <span>${message}</span>
+                </div>
+            `;
+        
+            alertContainer.appendChild(alert);
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+
+
